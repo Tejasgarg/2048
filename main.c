@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h>
-#include <termios.h> 
+#include <unistd.h> // For usleep()
+#include <termios.h> // For handling keypresses without Enter
+
 #define SIZE 4
 
 int arr[SIZE][SIZE] = {0}, score = 0, highscore = 0;
@@ -20,24 +21,26 @@ char get_input() {
     return ch;
 }
 
-// Function to print the game board with uniform spacing
+// Function to print the game board with larger spacing and bold numbers
 void print_board() {
     system("clear"); // For Linux/macOS; use "cls" for Windows
-    printf("\n\t\t\t\t=============== 2048 ===============\n");
+
+    printf("\n\t\t\t\t===========  2048  ===========\n");
     printf("\t\t\t\tYOUR SCORE: %d\n", score);
     printf("\t\t\t\tHIGH SCORE: %d\n", highscore);
-    printf("\t\t\t\t---------------------------------\n");
+    printf("\t\t\t\t==============================\n");
 
     for (int i = 0; i < SIZE; i++) {
-        printf("\t\t\t\t|");
+        printf("\t\t\t\t\u2551"); // Thick left border
         for (int j = 0; j < SIZE; j++) {
             if (arr[i][j] == 0) {
-                printf("      |");  // Empty cell
+                printf("       ");  // Empty cell (wider for better visibility)
             } else {
-                printf(" %4d |", arr[i][j]);  // Right-aligned within 6 spaces
+                printf("  \033[1m%-4d\033[0m  ", arr[i][j]);  // Bold number with padding
             }
+            printf("\u2551"); // Thick column separator
         }
-        printf("\n\t\t\t\t---------------------------------\n");
+        printf("\n\t\t\t\t==============================\n");
     }
 
     printf("\t\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
