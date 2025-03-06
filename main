@@ -46,6 +46,127 @@ void print_board() {
     printf("\t\t\t\tEnter your move: ");
 }
 
+void add_random_number() {
+    int i, j;
+    srand(time(NULL));
+
+    do {
+        i = rand() % SIZE;
+        j = rand() % SIZE;
+    } while (arr[i][j] != 0);
+
+    arr[i][j] = (rand() % 10 < 9) ? 2 : 4; // 90% chance of 2, 10% chance of 4
+}
+
+// Function to move and merge tiles left
+void move_left() {
+    for (int i = 0; i < SIZE; i++) {
+        int temp[SIZE] = {0}, pos = 0;
+        for (int j = 0; j < SIZE; j++) {
+            if (arr[i][j] != 0) {
+                if (temp[pos] == 0) {
+                    temp[pos] = arr[i][j];
+                } else if (temp[pos] == arr[i][j]) {
+                    temp[pos] *= 2;
+                    score += temp[pos];
+                    pos++;
+                } else {
+                    pos++;
+                    temp[pos] = arr[i][j];
+                }
+            }
+        }
+        for (int j = 0; j < SIZE; j++) arr[i][j] = temp[j];
+    }
+}
+
+// Function to move and merge tiles right
+void move_right() {
+    for (int i = 0; i < SIZE; i++) {
+        int temp[SIZE] = {0}, pos = SIZE - 1;
+        for (int j = SIZE - 1; j >= 0; j--) {
+            if (arr[i][j] != 0) {
+                if (temp[pos] == 0) {
+                    temp[pos] = arr[i][j];
+                } else if (temp[pos] == arr[i][j]) {
+                    temp[pos] *= 2;
+                    score += temp[pos];
+                    pos--;
+                } else {
+                    pos--;
+                    temp[pos] = arr[i][j];
+                }
+            }
+        }
+        for (int j = 0; j < SIZE; j++) arr[i][j] = temp[j];
+    }
+}
+
+// Function to move and merge tiles up
+void move_up() {
+    for (int j = 0; j < SIZE; j++) {
+        int temp[SIZE] = {0}, pos = 0;
+        for (int i = 0; i < SIZE; i++) {
+            if (arr[i][j] != 0) {
+                if (temp[pos] == 0) {
+                    temp[pos] = arr[i][j];
+                } else if (temp[pos] == arr[i][j]) {
+                    temp[pos] *= 2;
+                    score += temp[pos];
+                    pos++;
+                } else {
+                    pos++;
+                    temp[pos] = arr[i][j];
+                }
+            }
+        }
+        for (int i = 0; i < SIZE; i++) arr[i][j] = temp[i];
+    }
+}
+
+// Function to move and merge tiles down
+void move_down() {
+    for (int j = 0; j < SIZE; j++) {
+        int temp[SIZE] = {0}, pos = SIZE - 1;
+        for (int i = SIZE - 1; i >= 0; i--) {
+            if (arr[i][j] != 0) {
+                if (temp[pos] == 0) {
+                    temp[pos] = arr[i][j];
+                } else if (temp[pos] == arr[i][j]) {
+                    temp[pos] *= 2;
+                    score += temp[pos];
+                    pos--;
+                } else {
+                    pos--;
+                    temp[pos] = arr[i][j];
+                }
+            }
+        }
+        for (int i = 0; i < SIZE; i++) arr[i][j] = temp[i];
+    }
+}
+
+// Function to check if the game is over
+int is_game_over() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (arr[i][j] == 0) return 0;
+            if (j < SIZE - 1 && arr[i][j] == arr[i][j + 1]) return 0;
+            if (i < SIZE - 1 && arr[i][j] == arr[i + 1][j]) return 0;
+        }
+    }
+    return 1;
+}
+
+// Function to reset the game
+void reset_game() {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            arr[i][j] = 0;
+    score = 0;
+    add_random_number();
+}
+
 int main() {
     printf("=============== 2048 ===============\n");
     printf("WELCOME TO 2048\n");
