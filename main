@@ -58,6 +58,23 @@ void add_random_number() {
     arr[i][j] = (rand() % 10 < 9) ? 2 : 4; // 90% chance of 2, 10% chance of 4
 }
 
+
+// Function to copy board
+void copy_board(int src[SIZE][SIZE], int dest[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            dest[i][j] = src[i][j];
+}
+
+// Function to check if board state has changed
+int board_changed(int old_board[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            if (old_board[i][j] != arr[i][j])
+                return 1; // Board has changed
+    return 0; // No change
+}
+
 // Function to move and merge tiles left
 void move_left() {
     for (int i = 0; i < SIZE; i++) {
