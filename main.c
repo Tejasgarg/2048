@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <unistd.h> // For usleep()
-#include <termios.h> // For handling keypresses without Enter
-
+#include <unistd.h>
+#include <termios.h> 
 #define SIZE 4
 
 int arr[SIZE][SIZE] = {0}, score = 0, highscore = 0;
@@ -46,6 +45,7 @@ void print_board() {
     printf("\t\t\t\tEnter your move: ");
 }
 
+// Function to add a random number (2 or 4) to the board
 void add_random_number() {
     int i, j;
     srand(time(NULL));
@@ -58,7 +58,23 @@ void add_random_number() {
     arr[i][j] = (rand() % 10 < 9) ? 2 : 4; // 90% chance of 2, 10% chance of 4
 }
 
-// Function to move and merge tiles left
+// Function to copy board state
+void copy_board(int src[SIZE][SIZE], int dest[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            dest[i][j] = src[i][j];
+}
+
+// Function to check if the board state has changed
+int board_changed(int old_board[SIZE][SIZE]) {
+    for (int i = 0; i < SIZE; i++)
+        for (int j = 0; j < SIZE; j++)
+            if (old_board[i][j] != arr[i][j])
+                return 1; // Board changed
+    return 0; // No change
+}
+
+// Move and merge tiles left
 void move_left() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -80,7 +96,7 @@ void move_left() {
     }
 }
 
-// Function to move and merge tiles right
+// Move right
 void move_right() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -102,7 +118,7 @@ void move_right() {
     }
 }
 
-// Function to move and merge tiles up
+// Move up
 void move_up() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -124,7 +140,7 @@ void move_up() {
     }
 }
 
-// Function to move and merge tiles down
+// Move down
 void move_down() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -158,7 +174,7 @@ int is_game_over() {
     return 1;
 }
 
-// Function to reset the game
+// Reset the game
 void reset_game() {
     for (int i = 0; i < SIZE; i++)
         for (int j = 0; j < SIZE; j++)
@@ -167,6 +183,7 @@ void reset_game() {
     add_random_number();
 }
 
+// Main function
 int main() {
     printf("=============== 2048 ===============\n");
     printf("WELCOME TO 2048\n");
@@ -187,28 +204,21 @@ int main() {
     print_board();
 
     while (1) {
+        int old_board[SIZE][SIZE];
+        copy_board(arr, old_board); // Save old state
+
         char move = get_input();
+        if (move == 'R' || move == 'r') reset_game();
+        else if (move == 'U' || move == 'u') exit(0);
+        else if (move == 'A' || move == 'a') move_left();
+        else if (move == 'D' || move == 'd') move_right();
+        else if (move == 'W' || move == 'w') move_up();
+        else if (move == 'S' || move == 's') move_down();
 
-        if (move == 'R' || move == 'r') {
-            reset_game();
-        } else if (move == 'U' || move == 'u') {
-            exit(0);
-        } else if (move == 'A' || move == 'a') {
-            move_left();
-        } else if (move == 'D' || move == 'd') {
-            move_right();
-        } else if (move == 'W' || move == 'w') {
-            move_up();
-        } else if (move == 'S' || move == 's') {
-            move_down();
-        }
-
-        add_random_number();
+        if (board_changed(old_board)) add_random_number(); // Add only if a move happened
         print_board();
 
-        if (is_game_over()) {
-            printf("\n\t\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
-        }
+        if (is_game_over()) printf("\n\t\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
     }
     return 0;
 }
