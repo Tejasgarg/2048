@@ -29,6 +29,14 @@ char get_input() {
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
     ch = getchar();
+    if (ch == '\033') { // Detect arrow keys
+        getchar(); // Skip '['
+        ch = getchar();
+        if (ch == 'A') ch = 'W'; // Up arrow
+        else if (ch == 'B') ch = 'S'; // Down arrow
+        else if (ch == 'C') ch = 'D'; // Right arrow
+        else if (ch == 'D') ch = 'A'; // Left arrow
+    }
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return ch;
 }
@@ -90,10 +98,11 @@ void print_board() {
         printf("\n\t\t\t------------------------------\n");
     }
 
-    printf("\t\t\tCONTROLS: " BOLD "W" RESET " (Up), " BOLD "S" RESET " (Down), " BOLD "A" RESET " (Left), " BOLD "D" RESET " (Right)\n");
+    printf("\t\t\tCONTROLS: Use Arrow Keys to Move\n");
     printf("\t\t\tRESTART: " BOLD "R" RESET " | EXIT: " BOLD "U" RESET "\n");
     printf("\t\t\tEnter your move: ");
 }
+
 
 // Function to add a random number (2 or 4) to the board
 void add_random_number() {
@@ -261,3 +270,4 @@ int main() {
     }
     return 0;
 }
+
