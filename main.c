@@ -21,31 +21,30 @@ char get_input() {
     return ch;
 }
 
-// Function to print the game board with larger spacing and bold numbers
+// Function to print the game board with perfect alignment
 void print_board() {
     system("clear"); // For Linux/macOS; use "cls" for Windows
 
-    printf("\n\t\t\t\t===========  2048  ===========\n");
-    printf("\t\t\t\tYOUR SCORE: %d\n", score);
-    printf("\t\t\t\tHIGH SCORE: %d\n", highscore);
-    printf("\t\t\t\t==============================\n");
+    printf("\n\t\t\t===========  2048  ===========\n");
+    printf("\t\t\tYOUR SCORE: %d\n", score);
+    printf("\t\t\tHIGH SCORE: %d\n");
+    printf("\t\t\t==============================\n");
 
     for (int i = 0; i < SIZE; i++) {
-        printf("\t\t\t\t\u2551"); // Thick left border
+        printf("\t\t\t|"); // Left border
         for (int j = 0; j < SIZE; j++) {
             if (arr[i][j] == 0) {
-                printf("       ");  // Empty cell (wider for better visibility)
+                printf("      |");  // Ensuring uniform spacing for empty cells
             } else {
-                printf("  \033[1m%-4d\033[0m  ", arr[i][j]);  // Bold number with padding
+                printf(" \033[1m%4d\033[0m |", arr[i][j]);  // Bold numbers, fixed-width
             }
-            printf("\u2551"); // Thick column separator
         }
-        printf("\n\t\t\t\t==============================\n");
+        printf("\n\t\t\t------------------------------\n"); // Row separator
     }
 
-    printf("\t\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
-    printf("\t\t\t\tRESTART: R | EXIT: U\n");
-    printf("\t\t\t\tEnter your move: ");
+    printf("\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
+    printf("\t\t\tRESTART: R | EXIT: U\n");
+    printf("\t\t\tEnter your move: ");
 }
 
 // Function to add a random number (2 or 4) to the board
@@ -77,7 +76,7 @@ int board_changed(int old_board[SIZE][SIZE]) {
     return 0; // No change
 }
 
-// Move and merge tiles left
+// Move and merge functions (same as before)
 void move_left() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -99,7 +98,6 @@ void move_left() {
     }
 }
 
-// Move right
 void move_right() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -121,7 +119,6 @@ void move_right() {
     }
 }
 
-// Move up
 void move_up() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -143,7 +140,6 @@ void move_up() {
     }
 }
 
-// Move down
 void move_down() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -188,21 +184,6 @@ void reset_game() {
 
 // Main function
 int main() {
-    printf("=============== 2048 ===============\n");
-    printf("WELCOME TO 2048\n");
-    printf("> CONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
-    printf("  RESTART: R | EXIT: U\n");
-    printf("Press any key to start...");
-    get_input();
-
-    system("clear");
-    printf("\nLoading...\n");
-    for (int i = 0; i < 35; i++) {
-        printf("#");
-        usleep(50000);
-    }
-    system("clear");
-
     add_random_number();
     print_board();
 
@@ -218,10 +199,10 @@ int main() {
         else if (move == 'W' || move == 'w') move_up();
         else if (move == 'S' || move == 's') move_down();
 
-        if (board_changed(old_board)) add_random_number(); // Add only if a move happened
+        if (board_changed(old_board)) add_random_number(); // Only add if board changed
         print_board();
 
-        if (is_game_over()) printf("\n\t\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
+        if (is_game_over()) printf("\n\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
     }
     return 0;
 }
