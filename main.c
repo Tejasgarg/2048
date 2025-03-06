@@ -8,6 +8,17 @@
 
 int arr[SIZE][SIZE] = {0}, score = 0, highscore = 0;
 
+// ANSI color codes for better visibility
+#define RESET   "\033[0m"
+#define BOLD    "\033[1m"
+#define RED     "\033[1;31m"
+#define GREEN   "\033[1;32m"
+#define YELLOW  "\033[1;33m"
+#define BLUE    "\033[1;34m"
+#define MAGENTA "\033[1;35m"
+#define CYAN    "\033[1;36m"
+#define WHITE   "\033[1;37m"
+
 // Function to get a single key input without pressing Enter
 char get_input() {
     struct termios oldt, newt;
@@ -21,30 +32,48 @@ char get_input() {
     return ch;
 }
 
-// Function to print the game board with perfect alignment
+// Function to colorize numbers based on value
+const char* get_color(int value) {
+    switch (value) {
+        case 2: return CYAN;
+        case 4: return GREEN;
+        case 8: return YELLOW;
+        case 16: return RED;
+        case 32: return MAGENTA;
+        case 64: return BLUE;
+        case 128: return "\033[1;91m";  // Bright Red
+        case 256: return "\033[1;92m";  // Bright Green
+        case 512: return "\033[1;93m";  // Bright Yellow
+        case 1024: return "\033[1;95m"; // Bright Magenta
+        case 2048: return "\033[1;94m"; // Bright Blue
+        default: return WHITE; // Default color for larger numbers
+    }
+}
+
+// Function to print the game board with better alignment & colors
 void print_board() {
     system("clear"); // For Linux/macOS; use "cls" for Windows
 
-    printf("\n\t\t\t===========  2048  ===========\n");
-    printf("\t\t\tYOUR SCORE: %d\n", score);
-    printf("\t\t\tHIGH SCORE: %d\n");
-    printf("\t\t\t==============================\n");
+    printf("\n\t\t\t" BOLD WHITE "===========  2048  ===========\n" RESET);
+    printf("\t\t\t" BOLD YELLOW "YOUR SCORE: %d\n" RESET, score);
+    printf("\t\t\t" BOLD CYAN "HIGH SCORE: %d\n" RESET, highscore);
+    printf("\t\t\t" BOLD WHITE "==============================\n" RESET);
 
     for (int i = 0; i < SIZE; i++) {
         printf("\t\t\t|"); // Left border
         for (int j = 0; j < SIZE; j++) {
             if (arr[i][j] == 0) {
-                printf("      |");  // Ensuring uniform spacing for empty cells
+                printf("       |");  // Ensuring uniform spacing for empty cells
             } else {
-                printf(" \033[1m%4d\033[0m |", arr[i][j]);  // Bold numbers, fixed-width
+                printf(" %s%5d%s |", get_color(arr[i][j]), arr[i][j], RESET);  // Color and bold numbers
             }
         }
         printf("\n\t\t\t------------------------------\n"); // Row separator
     }
 
-    printf("\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
-    printf("\t\t\tRESTART: R | EXIT: U\n");
-    printf("\t\t\tEnter your move: ");
+    printf("\t\t\t" BOLD WHITE "CONTROLS: " RESET BOLD CYAN "W" RESET " (Up), " BOLD CYAN "S" RESET " (Down), " BOLD CYAN "A" RESET " (Left), " BOLD CYAN "D" RESET " (Right)\n");
+    printf("\t\t\t" BOLD RED "RESTART: R | EXIT: U\n" RESET);
+    printf("\t\t\t" BOLD WHITE "Enter your move: " RESET);
 }
 
 // Function to add a random number (2 or 4) to the board
@@ -76,7 +105,8 @@ int board_changed(int old_board[SIZE][SIZE]) {
     return 0; // No change
 }
 
-// Move and merge functions (same as before)
+
+// Function to move and merge tiles left
 void move_left() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -98,6 +128,7 @@ void move_left() {
     }
 }
 
+// Function to move and merge tiles right
 void move_right() {
     for (int i = 0; i < SIZE; i++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -119,6 +150,7 @@ void move_right() {
     }
 }
 
+// Function to move and merge tiles up
 void move_up() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = 0;
@@ -140,6 +172,7 @@ void move_up() {
     }
 }
 
+// Function to move and merge tiles down
 void move_down() {
     for (int j = 0; j < SIZE; j++) {
         int temp[SIZE] = {0}, pos = SIZE - 1;
@@ -160,6 +193,7 @@ void move_down() {
         for (int i = 0; i < SIZE; i++) arr[i][j] = temp[i];
     }
 }
+
 
 // Function to check if the game is over
 int is_game_over() {
@@ -202,7 +236,7 @@ int main() {
         if (board_changed(old_board)) add_random_number(); // Only add if board changed
         print_board();
 
-        if (is_game_over()) printf("\n\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
+        if (is_game_over()) printf("\n\t\t\t" BOLD RED "GAME OVER! Press R to Restart or U to Exit.\n" RESET);
     }
     return 0;
 }
