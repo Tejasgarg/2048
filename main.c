@@ -5,8 +5,20 @@
 #include <termios.h> // For handling keypresses without Enter
 
 #define SIZE 4
+#define HIGHSCORE_FILE "highscore.txt"
 
 int arr[SIZE][SIZE] = {0}, score = 0, highscore = 0;
+
+// ANSI color codes
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+#define RED "\033[1;31m"
+#define GREEN "\033[1;32m"
+#define YELLOW "\033[1;33m"
+#define BLUE "\033[1;34m"
+#define MAGENTA "\033[1;35m"
+#define CYAN "\033[1;36m"
+#define WHITE "\033[1;37m"
 
 // Function to get a single key input without pressing Enter
 char get_input() {
@@ -21,29 +33,65 @@ char get_input() {
     return ch;
 }
 
-// Function to print the game board with perfect alignment
-void print_board() {
-    system("clear"); // For Linux/macOS; use "cls" for Windows
+// Function to load the high score from a file
+void load_highscore() {
+    FILE *file = fopen(HIGHSCORE_FILE, "r");
+    if (file) {
+        fscanf(file, "%d", &highscore);
+        fclose(file);
+    }
+}
 
-    printf("\n\t\t\t===========  2048  ===========\n");
+// Function to save the high score to a file
+void save_highscore() {
+    FILE *file = fopen(HIGHSCORE_FILE, "w");
+    if (file) {
+        fprintf(file, "%d", highscore);
+        fclose(file);
+    }
+}
+
+// Function to get color for a specific number
+const char* get_color(int num) {
+    switch (num) {
+        case 2: return GREEN;
+        case 4: return YELLOW;
+        case 8: return BLUE;
+        case 16: return MAGENTA;
+        case 32: return CYAN;
+        case 64: return RED;
+        case 128: return WHITE;
+        case 256: return GREEN;
+        case 512: return YELLOW;
+        case 1024: return BLUE;
+        case 2048: return MAGENTA;
+        default: return RESET;
+    }
+}
+
+// Function to print the game board with colors
+void print_board() {
+    system("clear");
+
+    printf("\n\t\t\t===========  " BOLD "2048" RESET "  ===========\n");
     printf("\t\t\tYOUR SCORE: %d\n", score);
-    printf("\t\t\tHIGH SCORE: %d\n");
+    printf("\t\t\tHIGH SCORE: %d\n", highscore);
     printf("\t\t\t==============================\n");
 
     for (int i = 0; i < SIZE; i++) {
-        printf("\t\t\t|"); // Left border
+        printf("\t\t\t|");
         for (int j = 0; j < SIZE; j++) {
             if (arr[i][j] == 0) {
-                printf("      |");  // Ensuring uniform spacing for empty cells
+                printf("      |");
             } else {
-                printf(" \033[1m%4d\033[0m |", arr[i][j]);  // Bold numbers, fixed-width
+                printf(" %s%4d%s |", get_color(arr[i][j]), arr[i][j], RESET);
             }
         }
-        printf("\n\t\t\t------------------------------\n"); // Row separator
+        printf("\n\t\t\t------------------------------\n");
     }
 
-    printf("\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
-    printf("\t\t\tRESTART: R | EXIT: U\n");
+    printf("\t\t\tCONTROLS: " BOLD "W" RESET " (Up), " BOLD "S" RESET " (Down), " BOLD "A" RESET " (Left), " BOLD "D" RESET " (Right)\n");
+    printf("\t\t\tRESTART: " BOLD "R" RESET " | EXIT: " BOLD "U" RESET "\n");
     printf("\t\t\tEnter your move: ");
 }
 
@@ -183,13 +231,15 @@ void reset_game() {
 }
 
 // Main function
+
 int main() {
+    load_highscore();
     add_random_number();
     print_board();
 
     while (1) {
         int old_board[SIZE][SIZE];
-        copy_board(arr, old_board); // Save old state
+        copy_board(arr, old_board);
 
         char move = get_input();
         if (move == 'R' || move == 'r') reset_game();
@@ -199,10 +249,15 @@ int main() {
         else if (move == 'W' || move == 'w') move_up();
         else if (move == 'S' || move == 's') move_down();
 
-        if (board_changed(old_board)) add_random_number(); // Only add if board changed
+        if (score > highscore) {
+            highscore = score;
+            save_highscore();
+        }
+
+        if (board_changed(old_board)) add_random_number();
         print_board();
 
-        if (is_game_over()) printf("\n\t\t\tGAME OVER! Press R to Restart or U to Exit.\n");
+        if (is_game_over()) printf("\n\t\t\t" RED "GAME OVER!" RESET " Press " BOLD "R" RESET " to Restart or " BOLD "U" RESET " to Exit.\n");
     }
     return 0;
 }
