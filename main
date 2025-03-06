@@ -1,3 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h> // For usleep()
+#include <termios.h> // For handling keypresses without Enter
+
+#define SIZE 4
+
+int arr[SIZE][SIZE] = {0}, score = 0, highscore = 0;
+
+// Function to get a single key input without pressing Enter
+char get_input() {
+    struct termios oldt, newt;
+    char ch;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    return ch;
+}
+
+// Function to print the game board with uniform spacing
+void print_board() {
+    system("clear"); // For Linux/macOS; use "cls" for Windows
+    printf("\n\t\t\t\t=============== 2048 ===============\n");
+    printf("\t\t\t\tYOUR SCORE: %d\n", score);
+    printf("\t\t\t\tHIGH SCORE: %d\n", highscore);
+    printf("\t\t\t\t---------------------------------\n");
+
+    for (int i = 0; i < SIZE; i++) {
+        printf("\t\t\t\t|");
+        for (int j = 0; j < SIZE; j++) {
+            if (arr[i][j] == 0) {
+                printf("      |");  // Empty cell
+            } else {
+                printf(" %4d |", arr[i][j]);  // Right-aligned within 6 spaces
+            }
+        }
+        printf("\n\t\t\t\t---------------------------------\n");
+    }
+
+    printf("\t\t\t\tCONTROLS: W (Up), S (Down), A (Left), D (Right)\n");
+    printf("\t\t\t\tRESTART: R | EXIT: U\n");
+    printf("\t\t\t\tEnter your move: ");
+}
+
 int main() {
     printf("=============== 2048 ===============\n");
     printf("WELCOME TO 2048\n");
